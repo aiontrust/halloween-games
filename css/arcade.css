@@ -216,6 +216,7 @@ canvas:focus-visible { outline: 2px solid var(--bone); outline-offset: 3px; }
 .row .tot { font-weight: 500; color: var(--bone); }
 .row.first .ini, .row.first .tot { color: var(--marrow); }
 .row.head .num { font-family: var(--font-display); font-size: 0.78rem; }
+.row.head .ini { font-family: var(--font-display); font-size: 0.78rem; font-weight: 400; letter-spacing: 0.1em; }
 .table { margin: 0; padding: 0; list-style: none; }
 .footnote { margin: 10px 0 0; color: var(--bone-dim); font-size: 0.95rem; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
