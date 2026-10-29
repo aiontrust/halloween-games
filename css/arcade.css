@@ -311,3 +311,6 @@ body[data-page="hub"] .wrap { position: relative; z-index: 1; }
 @keyframes dangle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(12px); } }
 @media (min-width: 860px) { .web-m { right: 30%; } .web-l { width: 190px; } .web-r { width: 140px; } .web-m { width: 76px; right: 30%; } }
 @media (prefers-reduced-motion: reduce) { .web-m .dangle { animation: none; } }
+
+/* Footer */
+.foot { margin-top: 8px; padding-top: 14px; border-top: 1px solid var(--line); text-align: center; font-family: var(--font-display); font-size: 0.85rem; letter-spacing: 0.12em; color: var(--bone-dim); }
