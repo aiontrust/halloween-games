@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Haunted House | Halloween Games</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&display=swap">
+  <link rel="stylesheet" href="../../css/arcade.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-root="../../" data-game="house">
+  <main class="wrap">
+    <header class="top">
+      <a class="brand" href="../../index.html">Halloween Games</a>
+      <button type="button" class="btn ghost small" id="snd" aria-pressed="true">Sound on</button>
+    </header>
+    <div class="gamebar">
+      <a class="back" href="../../index.html">&larr; All games</a>
+      <h1>Haunted House</h1>
+      <div class="gscore"><span class="k">Decorations</span><span class="v" id="count">0</span></div>
+    </div>
+
+    <section class="house-wrap" aria-label="Your haunted house">
+      <svg id="scene" class="scene" viewBox="0 0 400 360" role="group" aria-label="The haunted house"></svg>
+      <p class="hint" id="hint">Pick something from the table, then tap a spot on the house.</p>
+    </section>
+
+    <section class="card">
+      <p class="eyebrow"><span>The table</span><span class="mono" id="picked">Nothing picked</span></p>
+      <div class="shelf" id="table"></div>
+    </section>
+
+    <section class="card">
+      <p class="eyebrow"><span>Paint</span></p>
+      <div class="chips" id="targets" role="group" aria-label="What to paint"></div>
+      <div class="swatches" id="swatches" role="group" aria-label="Paint colours"></div>
+    </section>
+
+    <section class="card">
+      <p class="eyebrow"><span>Lights</span></p>
+      <div class="chips" id="rooms" role="group" aria-label="Room lights"></div>
+      <div class="actions" style="margin-top: 12px">
+        <button type="button" class="btn small" id="allOn">All on</button>
+        <button type="button" class="btn ghost small" id="allOff">All off</button>
+        <button type="button" class="btn ghost small" id="clearDeco">Clear decorations</button>
+        <button type="button" class="btn ghost small" id="resetHouse">Start over</button>
+      </div>
+    </section>
+    <div class="sr" id="live" aria-live="polite"></div>
+  </main>
+
+  <script src="../../js/arcade.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
