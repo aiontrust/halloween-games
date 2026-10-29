@@ -1,0 +1,34 @@
+.cauldron-wrap { position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.cauldron { width: min(100%, 300px); height: auto; overflow: visible; }
+.cauldron .fire path { transform-origin: 50% 100%; animation: flick 0.9s ease-in-out infinite alternate; }
+.cauldron .fire path:nth-child(2) { animation-duration: 0.7s; }
+#brew { transition: fill 0.5s; }
+.cauldron.stirring #brew { animation: swirl 0.5s ease-in-out infinite alternate; transform-origin: 120px 77px; }
+.cauldron.shake { animation: shake 0.5s; }
+@keyframes flick { from { transform: scaleY(0.9) scaleX(1); } to { transform: scaleY(1.1) scaleX(0.94); } }
+@keyframes swirl { from { transform: scaleX(0.96) rotate(-3deg); } to { transform: scaleX(1.02) rotate(3deg); } }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-5px) rotate(-1deg); } 40% { transform: translateX(5px) rotate(1deg); } 60% { transform: translateX(-3px); } 80% { transform: translateX(3px); } }
+
+.steam { position: absolute; top: -6px; left: 0; right: 0; height: 60px; pointer-events: none; }
+.steam i { position: absolute; bottom: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--puff, #6e8c3a); opacity: 0; animation: rise 2.6s ease-out forwards; }
+@keyframes rise { 0% { transform: translateY(0) scale(0.6); opacity: 0.55; } 100% { transform: translateY(-46px) scale(2.4); opacity: 0; } }
+#bubbles circle { animation: bub 1.4s ease-in infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes bub { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 30% { opacity: 0.85; } 100% { transform: translateY(-10px) scale(1.1); opacity: 0; } }
+
+.slots3 { display: flex; gap: 10px; justify-content: center; min-height: 52px; }
+.slot3 { width: 52px; height: 52px; border-radius: 10px; border: 1px dashed var(--line-strong); display: grid; place-items: center; background: var(--plate); }
+.slot3.on { border-style: solid; cursor: pointer; background: var(--plate-2); }
+.slot3 svg { width: 34px; height: 34px; }
+.actions.center { justify-content: center; }
+
+.result .dish { margin: 4px 0 6px; font-family: var(--font-display); font-weight: 400; font-size: 1.55rem; line-height: 1.15; color: var(--marrow); }
+.result .effect { margin: 10px 0 0; display: grid; gap: 2px; }
+.result.pop { animation: pop 0.5s ease-out; }
+@keyframes pop { from { transform: scale(0.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+#book li { grid-template-columns: 1fr auto; }
+#book .pts { color: var(--bone-dim); }
+@media (prefers-reduced-motion: reduce) {
+  .cauldron .fire path, .cauldron.stirring #brew, #bubbles circle, .cauldron.shake, .result.pop { animation: none; }
+  .steam i { animation-duration: 0.01s; }
+}

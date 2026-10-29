@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Witch Dinner | Halloween Games</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&display=swap">
+  <link rel="stylesheet" href="../../css/arcade.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-root="../../" data-game="witch">
+  <main class="wrap">
+    <header class="top">
+      <a class="brand" href="../../index.html">Halloween Games</a>
+      <button type="button" class="btn ghost small" id="snd" aria-pressed="true">Sound on</button>
+    </header>
+    <div class="gamebar">
+      <a class="back" href="../../index.html">&larr; All games</a>
+      <h1>Witch Dinner</h1>
+      <div class="gscore"><span class="k">Recipes found</span><span class="v" id="found">0</span></div>
+    </div>
+
+    <section class="card">
+      <p class="how">Pick three ingredients from the shelf and drop them in the cauldron. Stir, and see what the dinner turns out to be. The same three always make the same dish, so keep a note of your favourites.</p>
+    </section>
+
+    <section class="cauldron-wrap" aria-label="Cauldron">
+      <div class="steam" id="steam" aria-hidden="true"></div>
+      <svg class="cauldron" id="cauldron" viewBox="0 0 240 190" role="img" aria-label="A cauldron over a fire">
+        <ellipse cx="120" cy="178" rx="84" ry="9" fill="#07040a" opacity="0.6"/>
+        <g class="fire" aria-hidden="true">
+          <path d="M70 176c-2-14 6-22 4-32 10 8 12 18 8 32zM104 176c-4-18 6-30 2-42 14 10 18 26 10 42zM144 176c-2-12 4-20 2-28 8 6 10 16 6 28z" fill="#ef7d22"/>
+          <path d="M100 176c0-10 4-14 3-20 6 5 8 12 5 20z" fill="#f2a93b"/>
+        </g>
+        <path d="M40 76c-2 52 20 88 80 88s82-36 80-88z" fill="#2a2433" stroke="#0c0810" stroke-width="3"/>
+        <ellipse cx="120" cy="76" rx="82" ry="16" fill="#1b1624" stroke="#0c0810" stroke-width="3"/>
+        <ellipse id="brew" cx="120" cy="77" rx="72" ry="11" fill="#6e8c3a"/>
+        <path d="M40 76c-10 0-14 6-8 12M200 76c10 0 14 6 8 12" fill="none" stroke="#0c0810" stroke-width="5" stroke-linecap="round"/>
+        <path d="M56 106c-2 18 4 34 14 44" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="5" stroke-linecap="round"/>
+        <g id="bubbles"></g>
+      </svg>
+      <div class="slots3" id="slots" aria-label="Chosen ingredients"></div>
+      <div class="actions center">
+        <button type="button" class="btn" id="stir" disabled>Stir</button>
+        <button type="button" class="btn ghost" id="empty">Empty the pot</button>
+      </div>
+    </section>
+
+    <section class="card result" id="result" hidden aria-live="polite">
+      <p class="eyebrow"><span id="rKind">Tonight's dinner</span><span class="mono" id="rNew"></span></p>
+      <h2 class="dish" id="rName"></h2>
+      <p class="how" id="rDesc"></p>
+      <p class="effect"><span class="k">Side effect</span><span id="rEffect"></span></p>
+      <p class="effect"><span class="k">Guest verdict</span><span id="rVerdict"></span></p>
+    </section>
+
+    <section class="card">
+      <p class="eyebrow"><span>The shelf</span><button type="button" class="btn ghost small" id="shuffle">Restock</button></p>
+      <div class="shelf" id="shelf"></div>
+    </section>
+
+    <section class="card">
+      <p class="eyebrow"><span>Recipe book</span><span class="mono" id="bookCount"></span></p>
+      <ol class="list" id="book"></ol>
+      <p class="how" id="bookEmpty">Nothing yet. Cook something.</p>
+    </section>
+    <div class="sr" id="live" aria-live="polite"></div>
+  </main>
+
+  <script src="../../js/arcade.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
