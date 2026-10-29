@@ -26,8 +26,16 @@
 .result.pop { animation: pop 0.5s ease-out; }
 @keyframes pop { from { transform: scale(0.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-#book li { grid-template-columns: 1fr auto; }
-#book .pts { color: var(--bone-dim); }
+.dishpic { margin: 6px auto 0; max-width: 300px; }
+.dishpic svg { width: 100%; height: auto; display: block; }
+.ings { margin: 0 0 6px; font-family: var(--font-data); font-size: 0.78rem; color: var(--bone-dim); }
+.book { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 10px 0; }
+.recipe { font: inherit; color: var(--bone); background: var(--plate-2); border: 1px solid var(--line); border-radius: 10px; padding: 6px 6px 8px; cursor: pointer; display: flex; flex-direction: column; gap: 4px; min-width: 0; text-align: center; }
+.recipe:hover { border-color: var(--line-strong); }
+.recipe.gold { border-color: rgba(242, 169, 59, 0.6); }
+.recipe:focus-visible { outline: 2px solid var(--bone); outline-offset: 2px; }
+.recipe .thumb svg { width: 100%; height: auto; display: block; }
+.recipe .nm { font-size: 0.85rem; line-height: 1.15; }
 @media (prefers-reduced-motion: reduce) {
   .cauldron .fire path, .cauldron.stirring #brew, #bubbles circle, .cauldron.shake, .result.pop { animation: none; }
   .steam i { animation-duration: 0.01s; }

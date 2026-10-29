@@ -50,7 +50,9 @@
 
     <section class="card result" id="result" hidden aria-live="polite">
       <p class="eyebrow"><span id="rKind">Tonight's dinner</span><span class="mono" id="rNew"></span></p>
+      <div class="dishpic" id="rPic"></div>
       <h2 class="dish" id="rName"></h2>
+      <p class="ings" id="rIngs"></p>
       <p class="how" id="rDesc"></p>
       <p class="effect"><span class="k">Side effect</span><span id="rEffect"></span></p>
       <p class="effect"><span class="k">Guest verdict</span><span id="rVerdict"></span></p>
@@ -63,8 +65,8 @@
 
     <section class="card">
       <p class="eyebrow"><span>Recipe book</span><span class="mono" id="bookCount"></span></p>
-      <ol class="list" id="book"></ol>
-      <p class="how" id="bookEmpty">Nothing yet. Cook something.</p>
+      <div class="book" id="book"></div>
+      <p class="how" id="bookEmpty">Nothing yet. Cook something, then tap a recipe here to see it again.</p>
     </section>
     <div class="sr" id="live" aria-live="polite"></div>
   </main>

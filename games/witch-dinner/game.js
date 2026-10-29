@@ -69,6 +69,69 @@
   }
   function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
+  function mixOf(ids) {
+    var r = 0, gg = 0, b = 0;
+    ids.forEach(function (id) { var c = BY[id].color; r += parseInt(c.substr(1, 2), 16); gg += parseInt(c.substr(3, 2), 16); b += parseInt(c.substr(5, 2), 16); });
+    var h = function (v) { var x = Math.round(v / ids.length).toString(16); return x.length < 2 ? '0' + x : x; };
+    return '#' + h(r) + h(gg) + h(b);
+  }
+  function shade(hex, f) {
+    var out = '#';
+    for (var i = 1; i < 7; i += 2) {
+      var v = parseInt(hex.substr(i, 2), 16);
+      v = f < 0 ? v * (1 + f) : v + (255 - v) * f;
+      v = Math.max(0, Math.min(255, Math.round(v)));
+      out += (v < 16 ? '0' : '') + v.toString(16);
+    }
+    return out;
+  }
+  function glyph(id, x, y, s) { return '<g transform="translate(' + (x - 18 * s).toFixed(1) + ' ' + (y - 18 * s).toFixed(1) + ') scale(' + s + ')">' + BY[id].glyph + '</g>'; }
+
+  // A picture of the finished dish, drawn from its type, mixed colour and ingredients.
+  var KIND = { stew: 'bowl', broth: 'bowl', curry: 'bowl', chili: 'bowl', noodles: 'noodle', spaghetti: 'noodle', salad: 'bowl',
+    pie: 'pie', pudding: 'cup', sorbet: 'cup', crisps: 'plate', tacos: 'plate', bread: 'plate', souffle: 'ramekin', casserole: 'casserole' };
+  function dishSvg(d) {
+    var k = KIND[d.dish] || 'bowl', c = d.color, o = [], ids = d.ids, i;
+    var dark = shade(c, -0.35), light = shade(c, 0.35), steam = !/sorbet|salad|crisps/.test(d.dish);
+    o.push('<svg viewBox="0 0 200 150" role="img" aria-label="' + d.name + '">');
+    if (d.legendary) o.push('<circle cx="100" cy="80" r="70" fill="#f2a93b" opacity=".13"/><circle cx="100" cy="80" r="52" fill="#f2a93b" opacity=".1"/>');
+    o.push('<ellipse cx="100" cy="132" rx="76" ry="9" fill="#07040a" opacity=".55"/>');
+    if (k === 'bowl' || k === 'noodle') {
+      o.push('<path d="M28 74Q30 130 100 130T172 74z" fill="#e8dcc4"/><path d="M34 98Q100 112 166 98" fill="none" stroke="' + shade(c, -0.1) + '" stroke-width="5" opacity=".8"/>');
+      o.push('<ellipse cx="100" cy="74" rx="73" ry="15" fill="#f4ecd8"/><ellipse cx="100" cy="76" rx="64" ry="11" fill="' + dark + '"/><ellipse cx="100" cy="75" rx="60" ry="9" fill="' + c + '"/>');
+      if (k === 'noodle') for (i = 0; i < 6; i++) o.push('<path d="M' + (50 + i * 2) + ' ' + (72 + (i % 3) * 3) + 'q12-12 24 0t24 0t24 0t20 0" fill="none" stroke="' + light + '" stroke-width="3.2" stroke-linecap="round" opacity=".9"/>');
+      else o.push('<ellipse cx="82" cy="73" rx="14" ry="2.6" fill="' + light + '" opacity=".5"/>');
+      o.push(glyph(ids[0], 66, 66, 0.8), glyph(ids[1], 100, 60, 0.9), glyph(ids[2], 134, 66, 0.8));
+    } else if (k === 'pie') {
+      o.push('<path d="M30 92L38 118Q100 134 162 118L170 92z" fill="#b8b3c4"/><ellipse cx="100" cy="92" rx="72" ry="22" fill="#cfcad8"/><ellipse cx="100" cy="90" rx="66" ry="19" fill="' + c + '"/><ellipse cx="100" cy="88" rx="60" ry="16" fill="#d9a45c"/>');
+      o.push('<g stroke="#a8742f" stroke-width="3" opacity=".7"><path d="M60 80l50 16M80 74l50 16M100 72l40 12M60 94l36-18M82 100l48-22M108 102l32-16"/></g>');
+      o.push('<path d="M34 90q4 10 14 14M166 90q-4 10-14 14" fill="none" stroke="' + c + '" stroke-width="4" stroke-linecap="round"/>');
+      o.push(glyph(ids[0], 100, 80, 1.15), glyph(ids[1], 62, 92, 0.6), glyph(ids[2], 140, 92, 0.6));
+    } else if (k === 'cup') {
+      o.push('<path d="M62 62Q64 112 100 112T138 62z" fill="#cfe0ff" opacity=".35" stroke="#cfe0ff" stroke-width="2"/><path d="M66 72Q68 108 100 108T134 72z" fill="' + c + '"/><path d="M100 112v14M78 128h44" stroke="#cfe0ff" stroke-width="4" stroke-linecap="round" opacity=".7"/>');
+      o.push('<ellipse cx="100" cy="62" rx="38" ry="8" fill="#cfe0ff" opacity=".4"/><path d="M62 62Q70 28 100 30t38 32z" fill="' + light + '"/><path d="M76 52q8-14 24-14" fill="none" stroke="#fff" stroke-width="3" opacity=".5" stroke-linecap="round"/>');
+      o.push(glyph(ids[0], 100, 28, 0.85), glyph(ids[1], 68, 80, 0.55), glyph(ids[2], 132, 80, 0.55));
+    } else if (k === 'plate') {
+      o.push('<ellipse cx="100" cy="112" rx="82" ry="22" fill="#e8dcc4"/><ellipse cx="100" cy="110" rx="66" ry="16" fill="#f4ecd8"/><ellipse cx="100" cy="110" rx="52" ry="11" fill="none" stroke="' + shade(c, 0.1) + '" stroke-width="2"/>');
+      o.push('<ellipse cx="100" cy="106" rx="46" ry="9" fill="' + c + '" opacity=".8"/>');
+      for (i = 0; i < 9; i++) o.push('<circle cx="' + (62 + i * 9) + '" cy="' + (114 - (i % 3) * 3) + '" r="1.8" fill="' + dark + '"/>');
+      o.push(glyph(ids[0], 62, 92, 1.1), glyph(ids[1], 100, 82, 1.25), glyph(ids[2], 138, 92, 1.1));
+    } else if (k === 'ramekin') {
+      o.push('<path d="M56 72L62 122Q100 132 138 122L144 72z" fill="#e8dcc4"/><path d="M60 100Q100 112 140 100" fill="none" stroke="' + c + '" stroke-width="5" opacity=".85"/><ellipse cx="100" cy="72" rx="44" ry="9" fill="#f4ecd8"/>');
+      o.push('<path d="M58 72Q54 36 78 34Q88 18 108 24Q134 22 142 72z" fill="' + light + '"/><path d="M74 50q10-10 24-8" fill="none" stroke="#fff" stroke-width="3" opacity=".45" stroke-linecap="round"/>');
+      o.push(glyph(ids[0], 100, 46, 1.05), glyph(ids[1], 76, 62, 0.6), glyph(ids[2], 124, 62, 0.6));
+    } else {
+      o.push('<path d="M26 82L174 82L162 122Q100 134 38 122z" fill="#8c8a99"/><path d="M26 82L48 62H152L174 82z" fill="#b8b3c4"/><path d="M34 82L52 66H148L166 82z" fill="' + c + '"/><path d="M40 80L54 68H146L160 80" fill="none" stroke="' + light + '" stroke-width="3" stroke-dasharray="6 6" opacity=".8"/>');
+      o.push(glyph(ids[0], 70, 72, 0.8), glyph(ids[1], 100, 70, 0.9), glyph(ids[2], 130, 72, 0.8));
+    }
+    if (steam) o.push('<g fill="none" stroke="#efe6d2" stroke-width="3" stroke-linecap="round" opacity=".28"><path d="M78 44q-8-10 0-18t0-16"/><path d="M104 38q-8-10 0-18t0-14"/><path d="M128 44q-8-10 0-18t0-16"/></g>');
+    if (d.legendary) [[34, 28, 6], [168, 36, 5], [52, 112, 4], [160, 100, 6], [100, 12, 5]].forEach(function (s) {
+      o.push('<path d="M' + s[0] + ' ' + (s[1] - s[2]) + 'Q' + s[0] + ' ' + s[1] + ' ' + (s[0] + s[2]) + ' ' + s[1] + 'Q' + s[0] + ' ' + s[1] + ' ' + s[0] + ' ' + (s[1] + s[2]) + 'Q' + s[0] + ' ' + s[1] + ' ' + (s[0] - s[2]) + ' ' + s[1] + 'Q' + s[0] + ' ' + s[1] + ' ' + s[0] + ' ' + (s[1] - s[2]) + 'z" fill="#f2a93b"/>');
+    });
+    o.push('</svg>');
+    return o.join('');
+  }
+
   // The dish for a set of three ingredient ids. Pure and repeatable.
   function cook(ids) {
     var s = ids.slice().sort(), a = BY[s[0]], b = BY[s[1]], c = BY[s[2]], h = hash(s.join('|'));
@@ -76,7 +139,7 @@
     var effect = EFFECTS[(h >>> 3) % EFFECTS.length];
     if (legendary) effect += ' ' + EFFECTS[(h >>> 11) % EFFECTS.length];
     return {
-      key: s.join('|'),
+      key: s.join('|'), ids: s, dish: c.dish, color: mixOf(s),
       name: a.adj + ' ' + cap(b.noun) + ' ' + cap(c.dish),
       desc: DESCS[(h >>> 7) % DESCS.length](a, b, c),
       effect: effect,
@@ -180,6 +243,17 @@
     elLive.textContent = BY[id].name + ' added. ' + pot.length + ' of 3.';
   }
 
+  function showRecipe(d, isNew) {
+    $('rKind').textContent = d.legendary ? 'Legendary dinner' : 'Tonight\u2019s dinner';
+    $('rNew').textContent = isNew === null ? 'From your book' : isNew ? 'New recipe' : 'Seen before';
+    $('rName').textContent = d.name; $('rDesc').textContent = d.desc;
+    $('rEffect').textContent = d.effect; $('rVerdict').textContent = d.verdict;
+    $('rPic').innerHTML = dishSvg(d);
+    $('rIngs').textContent = d.ids.map(function (id) { return BY[id].name; }).join(' + ');
+    elResult.hidden = false;
+    elResult.classList.remove('pop'); void elResult.offsetWidth; elResult.classList.add('pop');
+  }
+
   function stir() {
     if (pot.length !== 3 || busy) return;
     sound.ensure(); busy = true; refresh();
@@ -190,12 +264,7 @@
       var d = cook(pot), isNew = !book.some(function (r) { return r.k === d.key; });
       busy = false; done = true;
       if (isNew) { book.unshift({ k: d.key, n: d.name, e: d.effect, t: Date.now() }); saveBook(); }
-      $('rKind').textContent = d.legendary ? 'Legendary dinner' : 'Tonight’s dinner';
-      $('rNew').textContent = isNew ? 'New recipe' : 'Seen before';
-      $('rName').textContent = d.name; $('rDesc').textContent = d.desc;
-      $('rEffect').textContent = d.effect; $('rVerdict').textContent = d.verdict;
-      elResult.hidden = false;
-      elResult.classList.remove('pop'); void elResult.offsetWidth; elResult.classList.add('pop');
+      showRecipe(d, isNew);
       elCauldron.classList.remove('shake'); void elCauldron.getBoundingClientRect(); elCauldron.classList.add('shake');
       puff(mixColor(), 9); sound.chime(d.legendary ? 2 : isNew ? 1 : 0);
       elLive.textContent = d.name + '. ' + d.effect;
@@ -204,14 +273,24 @@
   }
 
   function renderBook() {
-    var ol = $('book'); ol.textContent = '';
+    var box = $('book'); box.textContent = '';
     $('found').textContent = String(book.length);
     $('bookCount').textContent = book.length + ' of 455';
     $('bookEmpty').hidden = book.length > 0;
-    book.slice(0, 8).forEach(function (r) {
-      var li = el('li'); li.appendChild(el('span', 'lat', r.n)); li.appendChild(el('span', 'pts', ''));
-      li.setAttribute('title', r.e);
-      ol.appendChild(li);
+    book.forEach(function (r) {
+      var ids = r.k.split('|');
+      if (ids.length !== 3 || !ids.every(function (id) { return BY[id]; })) return;
+      var d = cook(ids), b = el('button', 'recipe' + (d.legendary ? ' gold' : ''));
+      b.type = 'button'; b.setAttribute('aria-label', 'View recipe: ' + d.name);
+      var pic = el('span', 'thumb'); pic.innerHTML = dishSvg(d);
+      b.appendChild(pic); b.appendChild(el('span', 'nm', d.name));
+      b.addEventListener('click', function () {
+        if (busy) return;
+        pot = ids.slice(); done = true; refresh(); showRecipe(d, null);
+        elLive.textContent = d.name + '. ' + d.effect;
+        elResult.scrollIntoView({ behavior: window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+      });
+      box.appendChild(b);
     });
   }
 
