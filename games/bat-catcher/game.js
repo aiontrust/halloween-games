@@ -9,6 +9,8 @@
 
   var DURATION = 40, SWING_R = 44, SWING_T = 0.2, COOLDOWN = 0.26, TOP = 40;
   var state, T, left, score, streak, bestStreak, caught, golds, crowsHit, misses;
+  var witch, witchT, wMiss = ['Missed me!', 'Too slow!', 'Hee hee hee!', 'Try again, dear!', 'Not me, the bats!'];
+  var wHello = ['Heh heh heh!', 'Catch me if you can!', 'Nice net, dear!', 'Fetch, little bats!'];
   var net, swing, cool, bats, spawnT, floaters, particles, over, fired, keys = {};
   var bg = A.makeLayer(), statItems = {};
 
@@ -26,7 +28,7 @@
 
   function reset() {
     state = 'play'; T = 0; left = DURATION; score = 0; streak = 0; bestStreak = 0; caught = 0; golds = 0; crowsHit = 0; misses = 0;
-    net = { x: 200, y: 420 }; swing = -1; cool = 0; bats = []; spawnT = 0.3; floaters = []; particles = []; over = 0; fired = false;
+    net = { x: 200, y: 420 }; swing = -1; cool = 0; bats = []; spawnT = 0.3; witch = null; witchT = 6 + Math.random() * 4; floaters = []; particles = []; over = 0; fired = false;
     elScore.textContent = '0'; renderStats();
     elLive.textContent = 'Go. Forty seconds.';
   }
@@ -51,11 +53,26 @@
   }
   function pop(x, y, txt, color, size) { floaters.push({ x: x, y: y, txt: txt, color: color, size: size || 20, life: 1.1 }); }
 
+  function cackle() {
+    var f = 430 + Math.random() * 90;
+    for (var i = 0; i < 5; i++) sound.tone(f + (i % 2 ? 110 : 0) - i * 14, 0.06, 0.1, 'sawtooth', i * 0.11);
+  }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function spawnWitch() {
+    var fromLeft = Math.random() < 0.5, y = TOP + 70 + Math.random() * 190;
+    witch = { x: fromLeft ? -60 : W + 60, y0: y, y: y, dir: fromLeft ? 1 : -1, v: 120 + Math.random() * 30, age: 0, dodge: 0, line: pick(wHello), lineT: 2.2 };
+    cackle();
+  }
+
   function doSwing() {
     if (state !== 'play' || cool > 0) return;
     sound.ensure();
     swing = 0; cool = COOLDOWN; sound.swoosh();
-    var gotBat = 0, pts = 0, hitCrow = false;
+    var gotBat = 0, pts = 0, hitCrow = false, hadStreak = streak;
+    if (witch && witch.dodge <= 0) {
+      var wx = witch.x - net.x, wy = witch.y - net.y;
+      if (wx * wx + wy * wy < (SWING_R + 22) * (SWING_R + 22)) { witch.dodge = 0.7; witch.line = pick(wMiss); witch.lineT = 1.8; cackle(); }
+    }
     bats.forEach(function (b) {
       if (b.caught) return;
       var dx = b.x - net.x, dy = b.y - net.y;
@@ -74,7 +91,10 @@
     });
     if (hitCrow) { streak = 0; sound.clack(300, true); }
     else if (gotBat) sound.chime(streak >= 6 ? 2 : streak >= 3 ? 1 : 0);
-    else { streak = 0; misses++; }
+    else {
+      streak = 0; misses++;
+      if (witch && hadStreak >= 3 && witch.dodge <= 0) { witch.line = 'Oops! Hehehe!'; witch.lineT = 1.6; cackle(); }
+    }
     score = Math.max(0, score + pts);
     elScore.textContent = String(score);
     renderStats();
@@ -89,7 +109,17 @@
       if (swing >= 0) { swing += dt; if (swing > SWING_T) swing = -1; }
       spawnT -= dt;
       if (spawnT <= 0) { spawn(); var prog = 1 - left / DURATION; spawnT = 0.75 - prog * 0.35 + Math.random() * 0.35; }
-      if (left <= 0) { left = 0; state = 'over'; over = 0; elLive.textContent = 'Dawn. Final score ' + score + '.'; }
+      if (witch) {
+        witch.age += dt; witch.lineT -= dt;
+        var sp = witch.v * (witch.dodge > 0 ? 2.4 : 1);
+        witch.x += witch.dir * sp * dt;
+        var lp = 0;
+        if (witch.dodge > 0) { witch.dodge -= dt; lp = Math.sin((0.7 - witch.dodge) / 0.7 * TAU) * 36; }
+        witch.y = witch.y0 + Math.sin(witch.age * 2.1) * 14 - lp;
+        if (Math.random() < dt * 22) particles.push({ x: witch.x - witch.dir * 40, y: witch.y + 6, vx: -witch.dir * 20 + (Math.random() - 0.5) * 20, vy: (Math.random() - 0.5) * 24, life: 0.7, max: 0.7, size: 1.2 + Math.random() * 1.6, color: Math.random() < 0.5 ? C.marrow : C.orchid });
+        if ((witch.dir > 0 && witch.x > W + 90) || (witch.dir < 0 && witch.x < -90)) { witch = null; witchT = 9 + Math.random() * 6; }
+      } else if (left > 4) { witchT -= dt; if (witchT <= 0) spawnWitch(); }
+      if (left <= 0) { left = 0; state = 'over'; over = 0; witch = null; elLive.textContent = 'Dawn. Final score ' + score + '.'; }
     } else if (state === 'over') {
       over += dt;
       if (over > 0.9 && !fired) { fired = true; A.finish({ game: 'bats', points: score, onReplay: reset }); }
@@ -175,10 +205,52 @@
     ctx.restore();
   }
 
+  function drawWitch() {
+    var w = witch; if (!w) return;
+    var mouth = 1.2 + Math.abs(Math.sin(T * 17)) * 3.4, tilt = Math.sin(w.age * 2.1 + 0.6) * 0.08 + (w.dodge > 0 ? Math.sin((0.7 - w.dodge) / 0.7 * TAU) * -0.5 * w.dir : 0);
+    ctx.save(); ctx.translate(w.x, w.y); ctx.rotate(tilt); ctx.scale(w.dir * 1.15, 1.15);
+    // broom: bristles trail behind
+    ctx.strokeStyle = '#8a5a34'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(-30, 10); ctx.lineTo(34, 4); ctx.stroke();
+    ctx.fillStyle = '#c9a15a'; ctx.beginPath(); ctx.moveTo(-28, 7); ctx.lineTo(-52, -2); ctx.lineTo(-48, 10); ctx.lineTo(-54, 20); ctx.lineTo(-28, 13); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#8a6a3a'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(-34, 8); ctx.lineTo(-50, 5); ctx.moveTo(-34, 11); ctx.lineTo(-50, 14); ctx.stroke();
+    // cape streaming back
+    ctx.fillStyle = '#2a1c33'; ctx.beginPath(); ctx.moveTo(2, -6); ctx.quadraticCurveTo(-22, -10 + Math.sin(T * 9) * 4, -34, 2 + Math.sin(T * 9 + 1) * 5); ctx.quadraticCurveTo(-16, 8, 8, 6); ctx.closePath(); ctx.fill();
+    // body and legs
+    ctx.fillStyle = '#3b2352'; ctx.beginPath(); ctx.ellipse(4, -2, 9, 11, -0.2, 0, TAU); ctx.fill();
+    ctx.strokeStyle = '#1a1024'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(6, 6); ctx.lineTo(12, 18); ctx.moveTo(1, 7); ctx.lineTo(4, 19); ctx.stroke();
+    ctx.fillStyle = '#e5694a'; ctx.beginPath(); ctx.ellipse(13, 19, 4, 2, 0, 0, TAU); ctx.ellipse(5, 20, 4, 2, 0, 0, TAU); ctx.fill();
+    // arm to the broom
+    ctx.strokeStyle = '#3b2352'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(8, -4); ctx.lineTo(20, 3); ctx.stroke();
+    // head
+    ctx.fillStyle = '#e07a2a'; ctx.beginPath(); ctx.moveTo(0, -20); ctx.quadraticCurveTo(-14, -16 + Math.sin(T * 10) * 2, -16, -4); ctx.lineTo(-2, -10); ctx.fill();
+    ctx.fillStyle = '#8fbf5a'; ctx.beginPath(); ctx.arc(8, -19, 8, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(15, -21); ctx.quadraticCurveTo(24, -19, 21, -13); ctx.quadraticCurveTo(19, -16, 15, -16); ctx.fill();
+    ctx.fillStyle = '#130d19'; ctx.beginPath(); ctx.arc(11, -22, 1.5, 0, TAU); ctx.fill();
+    ctx.strokeStyle = '#130d19'; ctx.lineWidth = 1.3; ctx.beginPath(); ctx.moveTo(8, -26); ctx.lineTo(14, -25); ctx.stroke();
+    ctx.fillStyle = '#130d19'; ctx.beginPath(); ctx.ellipse(11, -13, 4, mouth, 0.1, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#efe6d2'; ctx.fillRect(9.5, -13 - mouth + 0.5, 2, 1.8);
+    // hat
+    ctx.fillStyle = '#1f1530'; ctx.beginPath(); ctx.ellipse(6, -26, 15, 4, -0.1, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-3, -28); ctx.quadraticCurveTo(2, -44, -9 - Math.sin(T * 6) * 2, -52); ctx.quadraticCurveTo(10, -46, 14, -28); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#a97bc0'; ctx.fillRect(-1, -32, 14, 3);
+    ctx.restore();
+    if (w.lineT > 0) {
+      ctx.save(); ctx.font = 'italic 15px ' + F.body; ctx.textAlign = 'center';
+      var tw = ctx.measureText(w.line).width + 18, bx = clamp(w.x, tw / 2 + 6, W - tw / 2 - 6), by = w.y - 72;
+      ctx.globalAlpha = Math.min(1, w.lineT * 3);
+      ctx.fillStyle = 'rgba(239,230,210,0.96)'; ctx.beginPath(); rr(ctx, bx - tw / 2, by - 15, tw, 24, 10); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(bx - 4, by + 8); ctx.lineTo(clamp(w.x, bx - 12, bx + 12), by + 17); ctx.lineTo(bx + 6, by + 8); ctx.fill();
+      ctx.fillStyle = '#2a1c33'; ctx.fillText(w.line, bx, by + 2);
+      ctx.restore();
+    }
+  }
+
   function draw() {
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.drawImage(bg.c, 0, 0, W, H);
     bats.forEach(drawBat);
+    drawWitch();
     for (var q = 0; q < particles.length; q++) {
       var p = particles[q]; ctx.globalAlpha = Math.max(0, p.life / p.max); ctx.fillStyle = p.color;
       ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, TAU); ctx.fill();
