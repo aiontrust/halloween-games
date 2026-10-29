@@ -298,3 +298,16 @@ canvas:focus-visible { outline: 2px solid var(--bone); outline-offset: 3px; }
 .item:hover { border-color: var(--line-strong); }
 .item:focus-visible { outline: 2px solid var(--bone); outline-offset: 2px; }
 .item[disabled] { opacity: 0.3; cursor: default; }
+
+/* Hub cobwebs */
+body[data-page="hub"] { position: relative; }
+body[data-page="hub"] .wrap { position: relative; z-index: 1; }
+.webs { position: absolute; inset: 0 0 auto 0; height: 0; z-index: 0; pointer-events: none; color: rgba(239, 230, 210, 0.3); }
+.webs .web { position: absolute; display: block; height: auto; overflow: visible; }
+.web-l { top: 0; left: 0; width: min(38vw, 150px); }
+.web-r { top: 0; right: 0; width: min(28vw, 110px); transform: scaleX(-1); }
+.web-m { top: 0; right: 6%; width: 50px; }
+.web-m .dangle { animation: dangle 5.5s ease-in-out infinite; }
+@keyframes dangle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(12px); } }
+@media (min-width: 860px) { .web-m { right: 30%; } .web-l { width: 190px; } .web-r { width: 140px; } .web-m { width: 76px; right: 30%; } }
+@media (prefers-reduced-motion: reduce) { .web-m .dangle { animation: none; } }
