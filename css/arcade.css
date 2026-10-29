@@ -1,0 +1,291 @@
+/* Halloween Games: shared look for the hub and every game page.
+   One lantern-lit plate in aubergine ink, ivory bone, marrow gold as the accent. */
+:root {
+  --ink: #130d19;
+  --plate: #1e1526;
+  --plate-2: #2a1c33;
+  --line: #3b2c47;
+  --line-strong: #5a4668;
+  --bone: #efe6d2;
+  --bone-dim: #b4a78f;
+  --marrow: #f2a93b;
+  --pumpkin: #ef7d22;
+  --orchid: #a97bc0;
+  --ember: #e5694a;
+  --font-display: 'IM Fell English SC', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'IM Fell English', 'Iowan Old Style', Georgia, serif;
+  --font-data: 'DM Mono', ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { background: var(--ink); }
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--bone);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.45;
+  padding-top: max(14px, env(safe-area-inset-top, 0px));
+  padding-bottom: max(32px, env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  -webkit-text-size-adjust: 100%;
+}
+[hidden] { display: none !important; }
+a { color: inherit; }
+
+.wrap { max-width: 460px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 34px; }
+.brand {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  color: var(--bone-dim);
+  text-decoration: none;
+}
+.brand:hover { color: var(--bone); }
+
+.k { font-family: var(--font-display); font-size: 0.8rem; letter-spacing: 0.14em; color: var(--bone-dim); }
+.v { font-family: var(--font-data); font-weight: 500; font-size: 1.45rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+
+.btn {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  padding: 9px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--marrow);
+  background: var(--marrow);
+  color: var(--ink);
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn.ghost { background: transparent; color: var(--bone); border-color: var(--line-strong); }
+.btn.small { font-size: 0.9rem; padding: 6px 12px; }
+.btn:focus-visible { outline: 2px solid var(--bone); outline-offset: 2px; }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+
+.card { background: var(--plate); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; min-width: 0; }
+.eyebrow {
+  margin: 0 0 6px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  letter-spacing: 0.14em;
+  color: var(--bone-dim);
+}
+.eyebrow .mono { font-family: var(--font-data); letter-spacing: 0; font-variant-numeric: tabular-nums; }
+.how { margin: 0; color: var(--bone-dim); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Game pages */
+.gamebar { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 4px 12px; }
+.back { grid-column: 1 / -1; font-family: var(--font-display); letter-spacing: 0.08em; font-size: 0.9rem; color: var(--bone-dim); text-decoration: none; }
+.back:hover { color: var(--bone); }
+.gamebar h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.7rem, 7vw, 2.3rem);
+  letter-spacing: 0.03em;
+  line-height: 1;
+  text-wrap: balance;
+}
+.gscore { display: flex; flex-direction: column; align-items: flex-end; }
+
+.stage { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); }
+.boardwrap { position: relative; width: min(100%, 420px); margin-inline: auto; }
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 400 / 696;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--plate);
+  touch-action: manipulation;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+canvas:focus { outline: none; }
+canvas:focus-visible { outline: 2px solid var(--bone); outline-offset: 3px; }
+.stack { display: grid; gap: 14px; min-width: 0; align-content: start; }
+.latin { margin: 0; font-style: italic; font-size: 1.5rem; line-height: 1.15; }
+.eng { margin: 2px 0 12px; color: var(--bone-dim); }
+
+.list { list-style: none; margin: 0; padding: 0; }
+.list li {
+  display: grid;
+  grid-template-columns: 1.7rem minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: baseline;
+  padding: 5px 0;
+  border-bottom: 1px dotted var(--line);
+  color: var(--bone-dim);
+}
+.list li:last-child { border-bottom: 0; }
+.list .n, .list .pts { font-family: var(--font-data); font-size: 0.82rem; font-variant-numeric: tabular-nums; }
+.list .lat { font-style: italic; }
+.list .pts { text-align: right; min-width: 2.6rem; }
+.list li.next { color: var(--marrow); }
+.list li.done { color: var(--bone); }
+
+/* Hub */
+.hero h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.2rem, 10vw, 3.3rem);
+  letter-spacing: 0.03em;
+  line-height: 1;
+  text-wrap: balance;
+}
+.lede { margin: 10px 0 0; color: var(--bone-dim); max-width: 40ch; }
+.games { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+.game-card {
+  --accent: var(--bone);
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--plate);
+  color: inherit;
+  text-decoration: none;
+  min-width: 0;
+}
+.game-card:hover { border-color: var(--accent); }
+.game-card:focus-visible { outline: 2px solid var(--bone); outline-offset: 3px; }
+.game-card .icon { width: 48px; height: 48px; color: var(--accent); }
+.game-card h2 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 1.5rem; letter-spacing: 0.03em; line-height: 1.1; }
+.game-card p { margin: 0; color: var(--bone-dim); }
+.game-card .best { font-family: var(--font-data); font-size: 0.85rem; color: var(--bone); }
+.game-card .play {
+  justify-self: start;
+  font-family: var(--font-display);
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  background: var(--accent);
+  padding: 6px 14px;
+  border-radius: 8px;
+}
+
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; }
+.tab {
+  font-family: var(--font-display);
+  letter-spacing: 0.08em;
+  font-size: 0.92rem;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--bone-dim);
+  cursor: pointer;
+}
+.tab[aria-selected="true"] { background: var(--bone); color: var(--ink); border-color: var(--bone); }
+.tab:focus-visible { outline: 2px solid var(--bone); outline-offset: 2px; }
+
+.row {
+  display: grid;
+  grid-template-columns: 1.8rem 3.6rem repeat(3, minmax(0, 1fr)) 4.4rem;
+  gap: 6px;
+  align-items: baseline;
+  padding: 7px 0;
+  border-bottom: 1px dotted var(--line);
+}
+.row.single { grid-template-columns: 1.8rem minmax(0, 1fr) auto; }
+.row.head { color: var(--bone-dim); font-family: var(--font-display); font-size: 0.78rem; letter-spacing: 0.1em; }
+.row .rk, .row .num { font-family: var(--font-data); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+.row .num { text-align: right; }
+.row .rk { color: var(--bone-dim); }
+.row .ini { font-family: var(--font-data); font-weight: 500; font-size: 1.05rem; letter-spacing: 0.14em; }
+.row .tot { font-weight: 500; color: var(--bone); }
+.row.first .ini, .row.first .tot { color: var(--marrow); }
+.row.head .num { font-family: var(--font-display); font-size: 0.78rem; }
+.table { margin: 0; padding: 0; list-style: none; }
+.footnote { margin: 10px 0 0; color: var(--bone-dim); font-size: 0.95rem; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* Initials entry and result */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: rgba(10, 6, 14, 0.84);
+  padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  overflow-y: auto;
+}
+.mcard {
+  width: min(100%, 360px);
+  background: var(--plate);
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  padding: 20px 18px;
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  text-align: center;
+}
+.mcard:focus { outline: none; }
+.mcard .eyebrow { justify-content: center; margin: 0; }
+.final { margin: 0; font-family: var(--font-data); font-weight: 500; font-size: 3.2rem; line-height: 1.1; color: var(--marrow); font-variant-numeric: tabular-nums; }
+.note { margin: 0; min-height: 1.4em; font-style: italic; font-size: 1.1rem; }
+.mblock { display: grid; gap: 10px; justify-items: center; width: 100%; margin-top: 6px; }
+.slots { display: flex; gap: 14px; justify-content: center; }
+.slot { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.arrow {
+  width: 54px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--bone);
+  cursor: pointer;
+}
+.arrow:focus-visible { outline: 2px solid var(--bone); outline-offset: 2px; }
+.arrow:active { background: var(--plate-2); }
+.letter {
+  width: 54px;
+  text-align: center;
+  font-family: var(--font-data);
+  font-weight: 500;
+  font-size: 3rem;
+  line-height: 1.15;
+  border-bottom: 3px solid var(--line-strong);
+  cursor: pointer;
+}
+.slot.on .letter { border-bottom-color: var(--marrow); color: var(--marrow); }
+.rankline { margin: 0; font-family: var(--font-display); font-size: 1.2rem; letter-spacing: 0.04em; }
+.subline { margin: 0; color: var(--bone-dim); }
+
+@media (min-width: 860px) {
+  .wrap { max-width: 980px; }
+  .stage { grid-template-columns: 420px minmax(0, 1fr); align-items: start; }
+  .boardwrap { margin-inline: 0; }
+  .games { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn:active { transform: none; }
+}
+
+/* Item pickers shared by Witch Dinner and Haunted House */
+.shelf { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+.item {
+  font: inherit; color: var(--bone); background: var(--plate-2); border: 1px solid var(--line); border-radius: 10px;
+  padding: 8px 2px 7px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; min-width: 0;
+}
+.item svg { width: 36px; height: 36px; }
+.item span { font-size: 0.74rem; line-height: 1.1; text-align: center; color: var(--bone-dim); padding: 0 2px; }
+.item:hover { border-color: var(--line-strong); }
+.item:focus-visible { outline: 2px solid var(--bone); outline-offset: 2px; }
+.item[disabled] { opacity: 0.3; cursor: default; }
