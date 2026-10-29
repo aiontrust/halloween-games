@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Bones Plinko | Halloween Games</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&display=swap">
+  <link rel="stylesheet" href="../../css/arcade.css">
+</head>
+<body data-root="../../" data-game="plinko">
+  <main class="wrap">
+    <header class="top">
+      <a class="brand" href="../../index.html">Halloween Games</a>
+      <button type="button" class="btn ghost small" id="snd" aria-pressed="true">Sound on</button>
+    </header>
+    <div class="gamebar">
+      <a class="back" href="../../index.html">&larr; All games</a>
+      <h1>Bones Plinko</h1>
+      <div class="gscore"><span class="k">Score</span><span class="v" id="score">0</span></div>
+    </div>
+
+    <section class="stage">
+      <div class="boardwrap">
+        <canvas id="board" tabindex="0" aria-label="Plinko board. A skeleton swings along a rail above a field of pegs. Tap or press Space to snap the next bone loose."></canvas>
+      </div>
+      <div class="stack">
+        <div class="card">
+          <p class="eyebrow"><span>Next specimen</span><span class="mono" id="count">0 / 17</span></p>
+          <p class="latin" id="nextLatin">Manus sinistra</p>
+          <p class="eng" id="nextEng">left hand</p>
+          <div class="actions">
+            <button type="button" class="btn" id="snap">Snap it loose</button>
+            <button type="button" class="btn ghost" id="reset">Reassemble</button>
+          </div>
+        </div>
+        <div class="card">
+          <p class="how">The skeleton rides a rail and sways as it goes. Tap the board to snap the next bone off, and time it so the bone clatters into a high bin. The skull comes last and counts double. Left and right follow the skeleton's own sides.</p>
+        </div>
+        <div class="card">
+          <p class="eyebrow"><span>Specimen list</span><span>Points</span></p>
+          <ol class="list" id="list"></ol>
+        </div>
+      </div>
+    </section>
+    <div class="sr" id="live" aria-live="polite"></div>
+  </main>
+
+  <script src="../../js/arcade.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
