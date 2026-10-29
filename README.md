@@ -1,15 +1,17 @@
 # Halloween Games
 
-A small static arcade of Halloween games with one scoreboard. No build step and no dependencies.
+A small static arcade of Halloween games with one arcade-style scoreboard, built to play on a phone. Three scored games, two creative ones, no build step and no dependencies.
+
+Play it: https://aiontrust.github.io/halloween-games/
 
 ## Games
 
 | Game | Type | What you do |
 | --- | --- | --- |
 | Bones Plinko | Scored | A skeleton falls apart one bone at a time. Time each drop to land in a high bin. |
-| Pumpkin Bowling | Scored | Roll a pumpkin at ten ghosts. Three taps set position, angle and power. |
-| Bat Catcher | Scored | Forty seconds to swing a net at bats. Chain catches for a multiplier and avoid the crows. |
-| Witch Dinner | Creative | Drop three ingredients in a cauldron and stir. The same three always make the same quirky dish. 455 recipes to find. |
+| Pumpkin Bowling | Scored | Roll a pumpkin at ten ghosts. Three taps set position, angle and power. One to three players take turns on one device and each saves their own score. |
+| Bat Catcher | Scored | Forty seconds to swing a net at bats. Chain catches for a multiplier and avoid the crows. A cackling witch flies past to tease you. |
+| Witch Dinner | Creative | Drop three ingredients in a cauldron and stir. The same three always make the same quirky dish, drawn as a picture. 455 recipes to find, kept in a recipe book you can tap through. |
 | Haunted House | Creative | Decorate from a table of items, paint the walls, roof, door and trim, and turn the lights on and off room by room. |
 
 The three scored games feed the scoreboard on the main page. Witch Dinner and Haunted House have no score. The hub shows how many recipes you have found and how many decorations you have placed.
