@@ -311,6 +311,11 @@
     }
   });
 
+  // Save the games for offline play (needs https or localhost).
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+    window.addEventListener('load', function () { navigator.serviceWorker.register(ROOT + 'sw.js').catch(function () { /* offline support is optional */ }); });
+  }
+
   window.Arcade = {
     W: W, H: H, DPR: DPR, PI: PI, TAU: TAU, C: C, F: F, GAMES: GAMES, ORDER: ORDER, ROOT: ROOT,
     clamp: clamp, rr: rr, el: el, setupCanvas: setupCanvas, makeLayer: makeLayer, createLoop: createLoop,

@@ -27,6 +27,14 @@ python3 -m http.server 8000
 
 Fonts come from Google Fonts, so the pages fall back to system serif fonts when offline.
 
+## Offline and install
+
+The games work with no connection after the first visit. `sw.js` is a service worker that saves every page, script, style and icon when the site first loads. Online it always asks the network first, so updates appear straight away, and it falls back to the saved copy after 3 seconds or when offline. The Google Fonts are saved the first time they load, and pages use system serif fonts until then.
+
+On a phone, use Share, then Add to Home Screen (iPhone) or the install prompt (Android) to get a full-screen app icon. `manifest.webmanifest` and `icons/` supply the name and the pumpkin icon.
+
+When you add a file, list it in `PRECACHE` in `sw.js` and change `CACHE` so phones refresh their saved list. Service workers need https or `localhost`, so opening `index.html` straight from disk skips offline support.
+
 ## Scores
 
 When an arcade game ends, a modal asks for three letters, like an old cabinet. Use the arrows, tap a letter, or type. Enter saves.
@@ -46,6 +54,9 @@ index.html            hub: game cards and scoreboard
 css/arcade.css        shared look and the initials modal
 js/arcade.js          window.Arcade: canvas setup, game loop, sound, scores, initials modal
 js/hub.js             hub cards and scoreboard
+sw.js                 service worker for offline play
+manifest.webmanifest  name and icons for installing on a phone
+icons/                app icons
 games/<name>/         one folder per game: index.html, game.js (and style.css where needed)
 ```
 
