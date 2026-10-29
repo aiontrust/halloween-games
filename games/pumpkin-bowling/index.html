@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Pumpkin Bowling | Halloween Games</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&display=swap">
+  <link rel="stylesheet" href="../../css/arcade.css">
+</head>
+<body data-root="../../" data-game="bowling">
+  <main class="wrap">
+    <header class="top">
+      <a class="brand" href="../../index.html">Halloween Games</a>
+      <button type="button" class="btn ghost small" id="snd" aria-pressed="true">Sound on</button>
+    </header>
+    <div class="gamebar">
+      <a class="back" href="../../index.html">&larr; All games</a>
+      <h1>Pumpkin Bowling</h1>
+      <div class="gscore"><span class="k">Score</span><span class="v" id="score">0</span></div>
+    </div>
+
+    <section class="stage">
+      <div class="boardwrap">
+        <canvas id="board" tabindex="0" aria-label="Bowling lane seen from above. Tap three times to set the pumpkin's position, angle and power, then it rolls at ten ghost pins."></canvas>
+      </div>
+      <div class="stack">
+        <div class="card">
+          <p class="how">Tap the lane three times for each roll. The first tap stops the pumpkin where it slides, the second stops the aim, and the third stops the power bar. Each ghost you knock off is 10 points. A strike adds 40 and a spare adds 20. Five frames, two rolls each.</p>
+          <div class="actions" style="margin-top: 12px">
+            <button type="button" class="btn" id="tap">Tap</button>
+            <button type="button" class="btn ghost" id="reset">Restart</button>
+          </div>
+        </div>
+        <div class="card">
+          <p class="eyebrow"><span>Scorecard</span><span>Points</span></p>
+          <ol class="list" id="frames"></ol>
+        </div>
+      </div>
+    </section>
+    <div class="sr" id="live" aria-live="polite"></div>
+  </main>
+
+  <script src="../../js/arcade.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
