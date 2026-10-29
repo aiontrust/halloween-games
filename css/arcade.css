@@ -314,3 +314,6 @@ body[data-page="hub"] .wrap { position: relative; z-index: 1; }
 
 /* Footer */
 .foot { margin-top: 8px; padding-top: 14px; border-top: 1px solid var(--line); text-align: center; font-family: var(--font-display); font-size: 0.85rem; letter-spacing: 0.12em; color: var(--bone-dim); }
+.foot a { color: var(--bone); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 3px; }
+.foot a:hover { text-decoration-color: var(--marrow); }
+.foot a:focus-visible { outline: 2px solid var(--bone); outline-offset: 2px; border-radius: 2px; }
