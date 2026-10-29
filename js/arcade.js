@@ -245,7 +245,7 @@
 
     save.addEventListener('click', saveScore);
     skip.addEventListener('click', function () { showAfter(null); });
-    again.addEventListener('click', function () { var fn = M.run && M.run.onReplay; closeModal(); if (fn) fn(); });
+    again.addEventListener('click', function () { var r = M.run, fn = r && (r.onNext || r.onReplay); closeModal(); if (fn) fn(); });
   }
 
   function closeModal() { if (UI.modal) UI.modal.hidden = true; M.open = false; M.run = null; }
@@ -256,9 +256,10 @@
     var last = 'AAA';
     try { var s = localStorage.getItem(LAST); if (s && /^[A-Z]{3}$/.test(s)) last = s; } catch (e) { /* storage is optional */ }
     M.letters = [last.charCodeAt(0), last.charCodeAt(1), last.charCodeAt(2)];
-    UI.game.textContent = GAMES[run.game].name;
+    UI.game.textContent = GAMES[run.game].name + (run.label ? ' \u00b7 ' + run.label : '');
     UI.score.textContent = String(run.points);
-    UI.note.textContent = '';
+    UI.note.textContent = run.note || '';
+    UI.again.textContent = run.nextLabel || 'Play again';
     UI.entry.hidden = false; UI.after.hidden = true;
     renderSlots();
     UI.modal.hidden = false;
@@ -286,7 +287,7 @@
       var line = row ? res.ini + ' has ' + row.total + ' points overall.' : '';
       if (!scores.persisted) line += ' This browser blocked storage, so the score is lost when you leave.';
       UI.sub.textContent = line;
-      UI.note.textContent = (res.rank === 1 && run.points > 0) ? 'New high score.' : '';
+      UI.note.textContent = [run.note, (res.rank === 1 && run.points > 0) ? 'New high score.' : ''].filter(Boolean).join(' ');
     } else {
       UI.rank.textContent = 'Score not saved';
       UI.sub.textContent = '';

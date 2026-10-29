@@ -10,27 +10,40 @@
 
   var LX0 = 70, LX1 = 330, GUT0 = 34, GUT1 = 366, PIT = 112, FOUL = 584, BALL_Y = 620, LANE_END = 650;
   var BR = 14, PR = 10, FRAMES = 5;
-  var phase, pt, aimX, aimA, power, ball, pins, frame, rollNo, n1, total, settleT, sweepT, rollT, advance, overT, fired, log;
+  var PKEY = 'halloween-games:bowling-players';
+  var players = 1, cur = 0, totals = [0, 0], logs = [[], []];
+  try { if (localStorage.getItem(PKEY) === '2') players = 2; } catch (e) { /* storage is optional */ }
+  var phase, pt, aimX, aimA, power, ball, pins, frame, rollNo, n1, settleT, sweepT, rollT, advance, overT, fired;
   var T = 0, floaters = [], particles = [], frameItems = [];
   var bg = A.makeLayer();
 
-  (function buildLog() {
+  function pname(i) { return players === 2 ? 'Player ' + (i + 1) : ''; }
+  function renderLog() {
+    elFrames.textContent = '';
+    if (players === 2) {
+      var hd = document.createElement('li'); hd.className = 'two head';
+      hd.appendChild(A.el('span', 'n', '')); hd.appendChild(A.el('span', 'pts', 'P1')); hd.appendChild(A.el('span', 'pts', 'P2'));
+      elFrames.appendChild(hd);
+    }
     for (var i = 0; i < FRAMES; i++) {
       var li = document.createElement('li');
       li.appendChild(A.el('span', 'n', String(i + 1)));
-      li.appendChild(A.el('span', 'lat', ''));
-      li.appendChild(A.el('span', 'pts', '–'));
-      elFrames.appendChild(li); frameItems.push(li);
+      if (players === 2) {
+        li.className = 'two' + (logs[0][i] && logs[1][i] ? ' done' : '');
+        [0, 1].forEach(function (pl) {
+          var e = logs[pl][i], isCur = phase !== 'over' && cur === pl && logs[pl].length === i;
+          li.appendChild(A.el('span', 'pts' + (isCur ? ' cur' : ''), e ? e.t.replace(/ pins$/, '').replace(/^Spare.*/, 'Spare') + ' \u00b7 ' + e.p : (isCur ? 'up' : '\u2013')));
+        });
+      } else {
+        var e1 = logs[0][i];
+        li.className = i < logs[0].length ? 'done' : (i === logs[0].length && phase !== 'over' ? 'next' : '');
+        li.appendChild(A.el('span', 'lat', e1 ? e1.t : ''));
+        li.appendChild(A.el('span', 'pts', e1 ? String(e1.p) : '\u2013'));
+      }
+      elFrames.appendChild(li);
     }
-  })();
-  function renderLog() {
-    frameItems.forEach(function (li, i) {
-      var e = log[i];
-      li.className = i < log.length ? 'done' : (i === log.length && phase !== 'over' ? 'next' : '');
-      li.children[1].textContent = e ? e.t : '';
-      li.children[2].textContent = e ? String(e.p) : '–';
-    });
   }
+  function showScore() { elScore.textContent = players === 2 ? totals[0] + ' \u2013 ' + totals[1] : String(totals[0]); }
   function say(t) { elLive.textContent = t; }
 
   function newPin(x, y) { return { x: x, y: y, hx: x, hy: y, vx: 0, vy: 0, r: PR, down: false, gone: false, goneT: 0 }; }
@@ -43,10 +56,11 @@
 
   function reset() {
     phase = 'pos'; pt = 0; aimX = 200; aimA = 0; power = 0; ball = null;
-    frame = 1; rollNo = 1; n1 = 0; total = 0; settleT = 0; sweepT = 0; rollT = 0; advance = false; overT = 0; fired = false;
-    log = []; floaters = []; particles = [];
+    frame = 1; rollNo = 1; n1 = 0; cur = 0; totals = [0, 0]; logs = [[], []]; settleT = 0; sweepT = 0; rollT = 0; advance = false; overT = 0; fired = false;
+    floaters = []; particles = [];
+    if (players === 2) floaters.push({ x: 200, y: 330, txt: 'PLAYER 1', life: 1.6, color: C.pumpkin, size: 30 });
     rack();
-    elScore.textContent = '0';
+    showScore();
     renderLog();
   }
 
@@ -139,7 +153,7 @@
       else standing++;
     });
     var gutter = ball && ball.inG, msg, bonus = 0, entry = null;
-    total += down * 10;
+    totals[cur] += down * 10;
     if (rollNo === 1) {
       if (standing === 0) { bonus = 40; msg = 'Strike'; advance = true; entry = { t: 'Strike', p: 100 + bonus }; }
       else { n1 = down; msg = down === 0 ? (gutter ? 'Gutter' : 'Miss') : down + ' down'; rollNo = 2; advance = false; }
@@ -149,13 +163,13 @@
       else { msg = n1 + down + ' down'; entry = { t: n + ' pins', p: n * 10 }; }
       advance = true;
     }
-    total += bonus;
-    if (entry) log.push(entry);
-    elScore.textContent = String(total);
+    totals[cur] += bonus;
+    if (entry) logs[cur].push(entry);
+    showScore();
     var big = bonus > 0;
     floaters.push({ x: 200, y: 330, txt: msg.toUpperCase(), life: 1.4, color: big ? C.marrow : C.bone, size: big ? 30 : 22 });
     if (down > 0) { burst(200, 190, big ? 26 : 12, big ? C.marrow : '#cfe0ff'); sound.chime(big ? 2 : 0); }
-    say(msg + '. Score ' + total + '.');
+    say((pname(cur) ? pname(cur) + ': ' : '') + msg + '. Score ' + totals[cur] + '.');
     phase = 'sweep'; sweepT = 0;
     renderLog();
   }
@@ -166,7 +180,12 @@
     ball = null;
     if (advance) {
       rollNo = 1; n1 = 0;
-      if (log.length >= FRAMES) { phase = 'over'; overT = 0; renderLog(); return; }
+      if (logs[0].length >= FRAMES && logs[players - 1].length >= FRAMES) { phase = 'over'; overT = 0; renderLog(); return; }
+      if (players === 2) {
+        cur = 1 - cur;
+        floaters.push({ x: 200, y: 330, txt: 'PLAYER ' + (cur + 1), life: 1.6, color: cur ? C.orchid : C.pumpkin, size: 30 });
+        say('Player ' + (cur + 1) + ', your turn.');
+      }
       rack();
     }
     phase = 'pos'; pt = 0; renderLog();
@@ -174,8 +193,18 @@
 
   function finish() {
     fired = true;
-    say('Game over. Final score ' + total + '.');
-    A.finish({ game: 'bowling', points: total, onReplay: reset });
+    if (players === 1) {
+      say('Game over. Final score ' + totals[0] + '.');
+      A.finish({ game: 'bowling', points: totals[0], onReplay: reset });
+      return;
+    }
+    var a = totals[0], b = totals[1];
+    var verdict = a === b ? 'A tie at ' + a + '.' : 'Player ' + (a > b ? 1 : 2) + ' wins, ' + Math.max(a, b) + ' to ' + Math.min(a, b) + '.';
+    say('Game over. ' + verdict);
+    A.finish({
+      game: 'bowling', points: a, label: 'Player 1', note: verdict, nextLabel: 'Player 2\u2019s score',
+      onNext: function () { A.finish({ game: 'bowling', points: b, label: 'Player 2', note: verdict, onReplay: reset }); }
+    });
   }
 
   function update(dt) {
@@ -274,8 +303,9 @@
     ctx.save(); ctx.translate(x, y); ctx.globalAlpha = alpha;
     ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.beginPath(); ctx.ellipse(2.5, 3.5, r, r * 0.95, 0, 0, TAU); ctx.fill();
     ctx.rotate(rot);
-    ctx.fillStyle = C.pumpkin; ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.fill();
-    ctx.strokeStyle = 'rgba(120,40,5,0.6)'; ctx.lineWidth = 1.4; ctx.lineCap = 'round';
+    var purple = players === 2 && cur === 1;
+    ctx.fillStyle = purple ? '#9a5fc0' : C.pumpkin; ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.fill();
+    ctx.strokeStyle = purple ? 'rgba(50,15,80,0.6)' : 'rgba(120,40,5,0.6)'; ctx.lineWidth = 1.4; ctx.lineCap = 'round';
     for (var k = 0; k < 6; k++) {
       var a = k * TAU / 6;
       ctx.beginPath(); ctx.moveTo(Math.cos(a) * 3.4, Math.sin(a) * 3.4);
@@ -349,8 +379,9 @@
 
     // HUD
     ctx.textAlign = 'left'; ctx.fillStyle = C.bone; ctx.font = '500 15px ' + F.mono;
-    var shownFrame = Math.min(FRAMES, log.length + (phase === 'over' ? 0 : 1));
-    ctx.fillText(shownFrame + ' / ' + FRAMES, 14, 29);
+    var shownFrame = Math.min(FRAMES, logs[cur].length + (phase === 'over' ? 0 : 1));
+    if (players === 2) { ctx.fillStyle = cur ? C.orchid : C.pumpkin; ctx.fillText('P' + (cur + 1) + ' \u00b7 ' + shownFrame + ' / ' + FRAMES, 14, 29); ctx.fillStyle = C.bone; }
+    else ctx.fillText(shownFrame + ' / ' + FRAMES, 14, 29);
     ctx.textAlign = 'right';
     ctx.fillText(rollNo + ' / 2 · ' + pins.filter(function (p) { return !p.down && !p.gone; }).length + ' standing', W - 14, 29);
   }
@@ -372,6 +403,18 @@
   });
   document.getElementById('tap').addEventListener('click', tap);
   document.getElementById('reset').addEventListener('click', reset);
+
+  function setMode(n) {
+    players = n;
+    try { localStorage.setItem(PKEY, String(n)); } catch (e) { /* storage is optional */ }
+    document.getElementById('p1btn').setAttribute('aria-pressed', n === 1 ? 'true' : 'false');
+    document.getElementById('p2btn').setAttribute('aria-pressed', n === 2 ? 'true' : 'false');
+    reset();
+  }
+  document.getElementById('p1btn').addEventListener('click', function () { if (players !== 1) setMode(1); });
+  document.getElementById('p2btn').addEventListener('click', function () { if (players !== 2) setMode(2); });
+  document.getElementById('p1btn').setAttribute('aria-pressed', players === 1 ? 'true' : 'false');
+  document.getElementById('p2btn').setAttribute('aria-pressed', players === 2 ? 'true' : 'false');
 
   reset();
   buildBg();
