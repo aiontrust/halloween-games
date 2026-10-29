@@ -135,7 +135,6 @@ canvas:focus-visible { outline: 2px solid var(--bone); outline-offset: 3px; }
 .list .pts { text-align: right; min-width: 2.6rem; }
 .list li.next { color: var(--marrow); }
 .list li.done { color: var(--bone); }
-.list li.two { grid-template-columns: 1.7rem minmax(0, 1fr) minmax(0, 1fr); }
 .list li.head { color: var(--bone-dim); font-family: var(--font-display); letter-spacing: 0.1em; font-size: 0.8rem; }
 .list .pts.cur { color: var(--marrow); }
 

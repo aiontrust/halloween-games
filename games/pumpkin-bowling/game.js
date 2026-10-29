@@ -11,29 +11,37 @@
   var LX0 = 70, LX1 = 330, GUT0 = 34, GUT1 = 366, PIT = 112, FOUL = 584, BALL_Y = 620, LANE_END = 650;
   var BR = 14, PR = 10, FRAMES = 5;
   var PKEY = 'halloween-games:bowling-players';
-  var players = 1, cur = 0, totals = [0, 0], logs = [[], []];
-  try { if (localStorage.getItem(PKEY) === '2') players = 2; } catch (e) { /* storage is optional */ }
+  var MAXP = 3, players = 1, cur = 0, totals = [0, 0, 0], logs = [[], [], []];
+  var PCOL = [C.pumpkin, C.orchid, '#8fbf5a'], PFILL = [C.pumpkin, '#9a5fc0', '#6e9a3a'], PLINE = ['rgba(120,40,5,0.6)', 'rgba(50,15,80,0.6)', 'rgba(25,55,10,0.6)'];
+  try { var sv = parseInt(localStorage.getItem(PKEY), 10); if (sv >= 1 && sv <= MAXP) players = sv; } catch (e) { /* storage is optional */ }
   var phase, pt, aimX, aimA, power, ball, pins, frame, rollNo, n1, settleT, sweepT, rollT, advance, overT, fired;
   var T = 0, floaters = [], particles = [], frameItems = [];
   var bg = A.makeLayer();
 
-  function pname(i) { return players === 2 ? 'Player ' + (i + 1) : ''; }
+  function pname(i) { return players > 1 ? 'Player ' + (i + 1) : ''; }
   function renderLog() {
     elFrames.textContent = '';
-    if (players === 2) {
-      var hd = document.createElement('li'); hd.className = 'two head';
-      hd.appendChild(A.el('span', 'n', '')); hd.appendChild(A.el('span', 'pts', 'P1')); hd.appendChild(A.el('span', 'pts', 'P2'));
+    var cols = '1.7rem' + ' minmax(0, 1fr)'.repeat(players), compact = players > 2, pl;
+    if (players > 1) {
+      var hd = document.createElement('li'); hd.className = 'head'; hd.style.gridTemplateColumns = cols;
+      hd.appendChild(A.el('span', 'n', ''));
+      for (pl = 0; pl < players; pl++) hd.appendChild(A.el('span', 'pts', 'P' + (pl + 1)));
       elFrames.appendChild(hd);
     }
     for (var i = 0; i < FRAMES; i++) {
       var li = document.createElement('li');
       li.appendChild(A.el('span', 'n', String(i + 1)));
-      if (players === 2) {
-        li.className = 'two' + (logs[0][i] && logs[1][i] ? ' done' : '');
-        [0, 1].forEach(function (pl) {
-          var e = logs[pl][i], isCur = phase !== 'over' && cur === pl && logs[pl].length === i;
-          li.appendChild(A.el('span', 'pts' + (isCur ? ' cur' : ''), e ? e.t.replace(/ pins$/, '').replace(/^Spare.*/, 'Spare') + ' \u00b7 ' + e.p : (isCur ? 'up' : '\u2013')));
-        });
+      if (players > 1) {
+        var all = true;
+        for (pl = 0; pl < players; pl++) if (!logs[pl][i]) all = false;
+        li.className = all ? 'done' : ''; li.style.gridTemplateColumns = cols;
+        for (pl = 0; pl < players; pl++) {
+          var e = logs[pl][i], isCur = phase !== 'over' && cur === pl && logs[pl].length === i, txt;
+          if (!e) txt = isCur ? 'up' : '\u2013';
+          else if (compact) txt = (/^Strike/.test(e.t) ? 'X ' : /^Spare/.test(e.t) ? '/ ' : '') + e.p;
+          else txt = e.t.replace(/ pins$/, '').replace(/^Spare.*/, 'Spare') + ' \u00b7 ' + e.p;
+          li.appendChild(A.el('span', 'pts' + (isCur ? ' cur' : ''), txt));
+        }
       } else {
         var e1 = logs[0][i];
         li.className = i < logs[0].length ? 'done' : (i === logs[0].length && phase !== 'over' ? 'next' : '');
@@ -43,7 +51,7 @@
       elFrames.appendChild(li);
     }
   }
-  function showScore() { elScore.textContent = players === 2 ? totals[0] + ' \u2013 ' + totals[1] : String(totals[0]); }
+  function showScore() { elScore.textContent = totals.slice(0, players).join(' \u2013 '); elScore.style.fontSize = players > 2 ? '1.1rem' : ''; }
   function say(t) { elLive.textContent = t; }
 
   function newPin(x, y) { return { x: x, y: y, hx: x, hy: y, vx: 0, vy: 0, r: PR, down: false, gone: false, goneT: 0 }; }
@@ -56,9 +64,9 @@
 
   function reset() {
     phase = 'pos'; pt = 0; aimX = 200; aimA = 0; power = 0; ball = null;
-    frame = 1; rollNo = 1; n1 = 0; cur = 0; totals = [0, 0]; logs = [[], []]; settleT = 0; sweepT = 0; rollT = 0; advance = false; overT = 0; fired = false;
+    frame = 1; rollNo = 1; n1 = 0; cur = 0; totals = [0, 0, 0]; logs = [[], [], []]; settleT = 0; sweepT = 0; rollT = 0; advance = false; overT = 0; fired = false;
     floaters = []; particles = [];
-    if (players === 2) floaters.push({ x: 200, y: 330, txt: 'PLAYER 1', life: 1.6, color: C.pumpkin, size: 30 });
+    if (players > 1) floaters.push({ x: 200, y: 330, txt: 'PLAYER 1', life: 1.6, color: PCOL[0], size: 30 });
     rack();
     showScore();
     renderLog();
@@ -180,10 +188,10 @@
     ball = null;
     if (advance) {
       rollNo = 1; n1 = 0;
-      if (logs[0].length >= FRAMES && logs[players - 1].length >= FRAMES) { phase = 'over'; overT = 0; renderLog(); return; }
-      if (players === 2) {
-        cur = 1 - cur;
-        floaters.push({ x: 200, y: 330, txt: 'PLAYER ' + (cur + 1), life: 1.6, color: cur ? C.orchid : C.pumpkin, size: 30 });
+      if (logs.slice(0, players).every(function (l) { return l.length >= FRAMES; })) { phase = 'over'; overT = 0; renderLog(); return; }
+      if (players > 1) {
+        cur = (cur + 1) % players;
+        floaters.push({ x: 200, y: 330, txt: 'PLAYER ' + (cur + 1), life: 1.6, color: PCOL[cur], size: 30 });
         say('Player ' + (cur + 1) + ', your turn.');
       }
       rack();
@@ -198,13 +206,21 @@
       A.finish({ game: 'bowling', points: totals[0], onReplay: reset });
       return;
     }
-    var a = totals[0], b = totals[1];
-    var verdict = a === b ? 'A tie at ' + a + '.' : 'Player ' + (a > b ? 1 : 2) + ' wins, ' + Math.max(a, b) + ' to ' + Math.min(a, b) + '.';
+    var sc = totals.slice(0, players), top = Math.max.apply(null, sc), win = [];
+    sc.forEach(function (v, i) { if (v === top) win.push(i + 1); });
+    var verdict = win.length === 1 ? 'Player ' + win[0] + ' wins with ' + top + '.'
+      : win.length === players ? 'Everyone ties at ' + top + '.'
+      : 'Players ' + win.slice(0, -1).join(', ') + ' and ' + win[win.length - 1] + ' tie at ' + top + '.';
     say('Game over. ' + verdict);
-    A.finish({
-      game: 'bowling', points: a, label: 'Player 1', note: verdict, nextLabel: 'Player 2\u2019s score',
-      onNext: function () { A.finish({ game: 'bowling', points: b, label: 'Player 2', note: verdict, onReplay: reset }); }
-    });
+    (function show(i) {
+      var last = i === players - 1;
+      A.finish({
+        game: 'bowling', points: sc[i], label: 'Player ' + (i + 1), note: verdict,
+        nextLabel: last ? undefined : 'Player ' + (i + 2) + '\u2019s score',
+        onNext: last ? undefined : function () { show(i + 1); },
+        onReplay: last ? reset : undefined
+      });
+    })(0);
   }
 
   function update(dt) {
@@ -303,9 +319,9 @@
     ctx.save(); ctx.translate(x, y); ctx.globalAlpha = alpha;
     ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.beginPath(); ctx.ellipse(2.5, 3.5, r, r * 0.95, 0, 0, TAU); ctx.fill();
     ctx.rotate(rot);
-    var purple = players === 2 && cur === 1;
-    ctx.fillStyle = purple ? '#9a5fc0' : C.pumpkin; ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.fill();
-    ctx.strokeStyle = purple ? 'rgba(50,15,80,0.6)' : 'rgba(120,40,5,0.6)'; ctx.lineWidth = 1.4; ctx.lineCap = 'round';
+    var pi = players > 1 ? cur : 0;
+    ctx.fillStyle = PFILL[pi]; ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.fill();
+    ctx.strokeStyle = PLINE[pi]; ctx.lineWidth = 1.4; ctx.lineCap = 'round';
     for (var k = 0; k < 6; k++) {
       var a = k * TAU / 6;
       ctx.beginPath(); ctx.moveTo(Math.cos(a) * 3.4, Math.sin(a) * 3.4);
@@ -380,7 +396,7 @@
     // HUD
     ctx.textAlign = 'left'; ctx.fillStyle = C.bone; ctx.font = '500 15px ' + F.mono;
     var shownFrame = Math.min(FRAMES, logs[cur].length + (phase === 'over' ? 0 : 1));
-    if (players === 2) { ctx.fillStyle = cur ? C.orchid : C.pumpkin; ctx.fillText('P' + (cur + 1) + ' \u00b7 ' + shownFrame + ' / ' + FRAMES, 14, 29); ctx.fillStyle = C.bone; }
+    if (players > 1) { ctx.fillStyle = PCOL[cur]; ctx.fillText('P' + (cur + 1) + ' \u00b7 ' + shownFrame + ' / ' + FRAMES, 14, 29); ctx.fillStyle = C.bone; }
     else ctx.fillText(shownFrame + ' / ' + FRAMES, 14, 29);
     ctx.textAlign = 'right';
     ctx.fillText(rollNo + ' / 2 · ' + pins.filter(function (p) { return !p.down && !p.gone; }).length + ' standing', W - 14, 29);
@@ -404,17 +420,18 @@
   document.getElementById('tap').addEventListener('click', tap);
   document.getElementById('reset').addEventListener('click', reset);
 
+  function markMode() {
+    for (var n = 1; n <= MAXP; n++) document.getElementById('p' + n + 'btn').setAttribute('aria-pressed', n === players ? 'true' : 'false');
+  }
   function setMode(n) {
     players = n;
     try { localStorage.setItem(PKEY, String(n)); } catch (e) { /* storage is optional */ }
-    document.getElementById('p1btn').setAttribute('aria-pressed', n === 1 ? 'true' : 'false');
-    document.getElementById('p2btn').setAttribute('aria-pressed', n === 2 ? 'true' : 'false');
-    reset();
+    markMode(); reset();
   }
-  document.getElementById('p1btn').addEventListener('click', function () { if (players !== 1) setMode(1); });
-  document.getElementById('p2btn').addEventListener('click', function () { if (players !== 2) setMode(2); });
-  document.getElementById('p1btn').setAttribute('aria-pressed', players === 1 ? 'true' : 'false');
-  document.getElementById('p2btn').setAttribute('aria-pressed', players === 2 ? 'true' : 'false');
+  [1, 2, 3].forEach(function (n) {
+    document.getElementById('p' + n + 'btn').addEventListener('click', function () { if (players !== n) setMode(n); });
+  });
+  markMode();
 
   reset();
   buildBg();
